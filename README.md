@@ -11,12 +11,12 @@
 1. [Minikube](https://minikube.sigs.k8s.io/docs/start/).
 1. [Kubens](https://github.com/ahmetb/kubectx#installation)
 
-#### Change dir into your Spark folder:
+#### Change dir into your Spark folder
 
 ```sh
 cd <something>/spark-3.3.1-bin-hadoop3/
 ```
-#### Create docker image:
+#### Create docker image
 
 ```sh
 ./bin/docker-image-tool.sh -m -t v3.3.1 build
@@ -26,7 +26,7 @@ Or if you need pyspark
 ./bin/docker-image-tool.sh -m -t v3.3.1 -p kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
 ```
 
-#### Share Minikube images with docker:
+#### Share Minikube images with docker
 
 ```sh
 eval $(minikube -p minikube docker-env)
@@ -35,7 +35,7 @@ docker images spark
 
 #### Create Kubernet resources
 
-From this git repo execute.
+From this git repo execute:
 
 ```sh
 k create -f k8s/rbac.yml
