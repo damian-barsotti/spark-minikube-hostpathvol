@@ -40,4 +40,4 @@ From this git repo execute:
 ```sh
 k create -f k8s/rbac.yml
 ```
-(Thanks https://github.com/jaceklaskowski/spark-meetups)
+(thanks https://github.com/jaceklaskowski/spark-meetups)
