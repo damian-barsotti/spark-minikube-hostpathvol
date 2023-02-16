@@ -117,17 +117,24 @@ $SPARK_HOME/bin/spark-submit \
 
 ### Run WordCount example (with `hostPath` shared folder)
 
-From the folder of this repo, open anoher terminal and keep running:
+#### Mount shared folder inside minikube
+
+Open a new terminal window and from the folder of this repo keep running:
 ```sh
 export MOUNT_PATH=/shared_folder
 minikube mount --uid=185 ./shared_folder:$MOUNT_PATH
 ```
+
+#### Run wordcount example
+
+From the first terminal window run:
 
 ```sh
 export K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.server}')
 export POD_NAME=wordcount-driver
 export VOLUME_TYPE=hostPath
 export VOLUME_NAME=demo-host-mount
+export MOUNT_PATH=/shared_folder
 ```
 
 ```sh
@@ -144,6 +151,6 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
     --conf spark.executor.instances=3 --verbose \
     local://$MOUNT_PATH/word_count/target/scala-2.12/wordcount_2.12-1.0.jar \
-    $MOUNT_PATH/LICENCE $MOUNT_PATH/wc-out
+    $MOUNT_PATH/LICENSE $MOUNT_PATH/wc-out
 ```
 
