@@ -13,11 +13,18 @@
 
 ### Setup
 
+#### Start minikube
+
+```sh
+minikube start --cpus 4 --memory 8192
+```
+
 #### Create `SPARK_HOME` environment variable
 
 ```sh
 export SPARK_HOME=<something>/spark-3.3.1-bin-hadoop3
 ```
+
 #### Create docker image
 
 ```sh
