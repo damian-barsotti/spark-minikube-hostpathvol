@@ -120,7 +120,7 @@ $SPARK_HOME/bin/spark-submit \
 From the folder of this repo, open anoher terminal and keep running:
 ```sh
 export MOUNT_PATH=/shared_folder
-minikube mount --uid=185 ./shared_folder:$MOUNT_PATH```
+minikube mount --uid=185 ./shared_folder:$MOUNT_PATH
 ```
 
 ```sh
