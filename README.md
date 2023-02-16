@@ -30,7 +30,7 @@ export SPARK_HOME=<something>/spark-3.3.1-bin-hadoop3
 ```sh
 $SPARK_HOME/bin/docker-image-tool.sh -m -t v3.3.1 build
 ```
-Or if you need pyspark
+Or if you need pyspark:
 ```sh
 $SPARK_HOME/bin/docker-image-tool.sh -m -t v3.3.1 -p kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
 ```
