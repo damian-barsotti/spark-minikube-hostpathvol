@@ -65,18 +65,19 @@ minikube dashboard
 ```
 After a while the dashboard should be opened in your web browser.
 
-### Run SparkPi example (without share folder)
+### Run SparkPi example (without shared folder)
 
 You can run this simple program to test your deployment.
 
 #### Execute
 
 ```sh
-K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.server}')
+export K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.server}')
 export POD_NAME=sparkpi-driver
 ```
 ```sh
-$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster --name spark-pi --class org.apache.spark.examples.SparkPi \
+$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
+    --name spark-pi --class org.apache.spark.examples.SparkPi \
     --conf spark.kubernetes.container.image=spark:v3.3.1 \
     --conf spark.kubernetes.driver.pod.name=$POD_NAME \
     --conf spark.kubernetes.context=minikube \
@@ -86,11 +87,17 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster --
     local:///opt/spark/examples/jars/spark-examples_2.12-3.3.1.jar 100
 ```
 
-To show pod **logs**:
+To show the pod **logs**:
 ```sh
 kubectl logs $POD_NAME
 ```
 or use Kubernetes dashboard.
+
+If you want to run again the example delete de driver pod:
+```sh
+kubectl delete pod $POD_NAME
+```
+or change `POD_NAME` environment variable, or delete conf `--conf spark.kubernetes.driver.pod.name=$POD_NAME`.
 
 #### Spark Application Management
 
@@ -101,11 +108,42 @@ $SPARK_HOME/bin/spark-submit \
   --status "spark-demo:$POD_NAME"
 ```
 
-To **kill** app:
+To **kill** the app:
 ```sh
 $SPARK_HOME/bin/spark-submit \
   --master k8s://$K8S_SERVER \
   --kill "spark-demo:$POD_NAME"
 ```
 
+### Run WordCount example (with `hostPath` shared folder)
+
+From the folder of this repo, open anoher terminal and keep running:
+```sh
+export MOUNT_PATH=/shared_folder
+minikube mount --uid=185 ./shared_folder:$MOUNT_PATH```
+```
+
+```sh
+export K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.server}')
+export POD_NAME=wordcount-driver
+export VOLUME_TYPE=hostPath
+export VOLUME_NAME=demo-host-mount
+```
+
+```sh
+$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
+    --name wordcount --class WordCount \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.container.image=spark:v3.3.1 \
+    --conf spark.kubernetes.driver.pod.name=$POD_NAME \
+    --conf spark.kubernetes.context=minikube \
+    --conf spark.kubernetes.namespace=spark-demo \
+    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+    --conf spark.executor.instances=3 --verbose \
+    local://$MOUNT_PATH/word_count/target/scala-2.12/wordcount_2.12-1.0.jar \
+    $MOUNT_PATH/LICENCE $MOUNT_PATH/wc-out
+```
 
