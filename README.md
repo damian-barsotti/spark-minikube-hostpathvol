@@ -2,6 +2,8 @@
 
 ## Sample deploy of Spark in Minikube with shared hostPath volume
 
+![Spark Kubernetes diagram](https://spark.apache.org/docs/3.3.1/img/k8s-cluster-mode.png)
+
 ### Requirements
 
 #### Install
