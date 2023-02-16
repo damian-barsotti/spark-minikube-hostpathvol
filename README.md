@@ -44,7 +44,7 @@ docker images spark
 
 #### Create Kubernet resources
 
-From this git repo execute:
+Change dir to this git repo execute:
 
 ```sh
 kubectl create -f k8s/rbac.yml
@@ -63,7 +63,7 @@ In another console run:
 ```sh
 minikube dashboard
 ```
-After a while the dashboard must be opened in your web browser.
+After a while the dashboard should be opened in your web browser.
 
 ### Run SparkPi example (without share folder)
 
@@ -74,7 +74,8 @@ You can run this simple program to test your deployment.
 ```sh
 K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.server}')
 export POD_NAME=sparkpi-driver
-
+```
+```sh
 $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster --name spark-pi --class org.apache.spark.examples.SparkPi \
     --conf spark.kubernetes.container.image=spark:v3.3.1 \
     --conf spark.kubernetes.driver.pod.name=$POD_NAME \
