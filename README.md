@@ -2,7 +2,7 @@
 
 ## Sample deploy of Spark in Minikube with shared hostPath volume
 
-### Instrucctions
+### Requirements
 
 #### Install
 
@@ -11,19 +11,21 @@
 1. [Minikube](https://minikube.sigs.k8s.io/docs/start/).
 1. [Kubens](https://github.com/ahmetb/kubectx#installation)
 
-#### Change dir into your Spark folder
+### Setup
+
+#### Create `SPARK_HOME` environment variable
 
 ```sh
-cd <something>/spark-3.3.1-bin-hadoop3/
+export SPARK_HOME=<something>/spark-3.3.1-bin-hadoop3
 ```
 #### Create docker image
 
 ```sh
-./bin/docker-image-tool.sh -m -t v3.3.1 build
+$SPARK_HOME/bin/docker-image-tool.sh -m -t v3.3.1 build
 ```
 Or if you need pyspark
 ```sh
-./bin/docker-image-tool.sh -m -t v3.3.1 -p kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
+$SPARK_HOME/bin/docker-image-tool.sh -m -t v3.3.1 -p kubernetes/dockerfiles/spark/bindings/python/Dockerfile build
 ```
 
 #### Share Minikube images with docker
@@ -38,6 +40,64 @@ docker images spark
 From this git repo execute:
 
 ```sh
-k create -f k8s/rbac.yml
+kubectl create -f k8s/rbac.yml
 ```
 (thanks https://github.com/jaceklaskowski/spark-meetups)
+
+#### Set default namespace
+
+```sh
+kubens spark-demo
+```
+
+#### Run Kubernetes dasboard
+
+In another console run:
+```sh
+minikube dashboard
+```
+After a while the dashboard must be opened in your web browser.
+
+### Run SparkPi example (without share folder)
+
+You can run this simple program to test your deployment.
+
+#### Execute
+
+```sh
+K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.server}')
+export POD_NAME=sparkpi-driver
+
+$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster --name spark-pi --class org.apache.spark.examples.SparkPi \
+    --conf spark.kubernetes.container.image=spark:v3.3.1 \
+    --conf spark.kubernetes.driver.pod.name=$POD_NAME \
+    --conf spark.kubernetes.context=minikube \
+    --conf spark.kubernetes.namespace=spark-demo \
+    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+    --conf spark.executor.instances=3 --verbose \
+    local:///opt/spark/examples/jars/spark-examples_2.12-3.3.1.jar 100
+```
+
+To show pod **logs**:
+```sh
+kubectl logs $POD_NAME
+```
+or use Kubernetes dashboard.
+
+#### Spark Application Management
+
+To show **status** of the running app:
+```sh
+$SPARK_HOME/bin/spark-submit \
+  --master k8s://$K8S_SERVER \
+  --status "spark-demo:$POD_NAME"
+```
+
+To **kill** app:
+```sh
+$SPARK_HOME/bin/spark-submit \
+  --master k8s://$K8S_SERVER \
+  --kill "spark-demo:$POD_NAME"
+```
+
+
