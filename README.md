@@ -25,7 +25,7 @@ minikube start --cpus 4 --memory 8192
 export SPARK_HOME=<something>/spark-3.3.1-bin-hadoop3
 ```
 
-#### Create docker image
+#### Create Spark default docker image
 
 ```sh
 $SPARK_HOME/bin/docker-image-tool.sh -m -t v3.3.1 build
