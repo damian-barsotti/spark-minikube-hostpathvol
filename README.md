@@ -4,6 +4,8 @@
 
 ![Spark Kubernetes diagram](https://spark.apache.org/docs/3.3.1/img/k8s-cluster-mode.png)
 
+See how `spark-submit` talks directly with Kubernetes API.
+
 ### Requirements
 
 #### Install
