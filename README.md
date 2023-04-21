@@ -82,7 +82,7 @@ export POD_NAME=sparkpi-driver
 ```sh
 $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     --name spark-pi --class org.apache.spark.examples.SparkPi \
-    --conf spark.kubernetes.container.image=spark:v3.3.1 \
+    --conf spark.kubernetes.container.image=apache/spark:v3.3.1 \
     --conf spark.kubernetes.driver.pod.name=$POD_NAME \
     --conf spark.kubernetes.context=minikube \
     --conf spark.kubernetes.namespace=spark-demo \
@@ -125,7 +125,7 @@ $SPARK_HOME/bin/spark-submit \
 
 Open a new terminal window and from the folder of this repo keep running:
 ```sh
-export MOUNT_PATH=/shared_folder
+export MOUNT_PATH=/shared-folder
 minikube mount --uid=185 ./shared_folder:$MOUNT_PATH
 ```
 
@@ -138,7 +138,7 @@ export K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.
 export POD_NAME=wordcount-driver
 export VOLUME_TYPE=hostPath
 export VOLUME_NAME=demo-host-mount
-export MOUNT_PATH=/shared_folder
+export MOUNT_PATH=/shared-folder
 ```
 
 ```sh
@@ -148,7 +148,7 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
     --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
     --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
-    --conf spark.kubernetes.container.image=spark:v3.3.1 \
+    --conf spark.kubernetes.container.image=apache/spark:v3.3.1 \
     --conf spark.kubernetes.driver.pod.name=$POD_NAME \
     --conf spark.kubernetes.context=minikube \
     --conf spark.kubernetes.namespace=spark-demo \
@@ -158,3 +158,38 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     $MOUNT_PATH/LICENSE $MOUNT_PATH/wc-out
 ```
 
+#### Write/read table with metastore db
+
+```sh
+kubectl apply -f metastore-mysql/mysql.yaml
+```
+
+```sh
+export K8S_SERVER=$(kubectl config view --output=jsonpath='{.clusters[].cluster.server}')
+export POD_NAME=test-metastore
+export VOLUME_TYPE=hostPath
+export VOLUME_NAME=demo-host-mount
+export MOUNT_PATH=/shared-folder
+```
+
+```sh
+$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
+    --name test-metastore \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.container.image=damianbarsotti/spark-py:v3.3.1.0 \
+    --conf spark.kubernetes.driver.pod.name=$POD_NAME \
+    --conf spark.kubernetes.context=minikube \
+    --conf spark.kubernetes.namespace=spark-demo \
+    --conf spark.kubernetes.authenticate.driver.serviceAccountName=spark \
+    --conf spark.executor.instances=3 --verbose \
+    --conf spark.hadoop.javax.jdo.option.ConnectionURL=jdbc:mysql://metastore-db/metastore \
+    --conf spark.hadoop.javax.jdo.option.ConnectionUserName=root \
+    --conf spark.hadoop.javax.jdo.option.ConnectionDriverName=com.mysql.cj.jdbc.Driver \
+    --conf spark.hadoop.javax.jdo.option.ConnectionPassword=my-secret-pw \
+    --conf spark.sql.warehouse.dir=/shared-folder/spark-warehouse \
+    --verbose \
+    local://$MOUNT_PATH/load_data_write_to_server.py
+```
