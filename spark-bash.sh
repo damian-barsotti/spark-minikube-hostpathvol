@@ -1,10 +1,8 @@
 #!/bin/bash
 
-TAG=damianbarsotti/spark-py:v3.3.1.0
+SPARK_IM=${SPARK_IM:-damianbarsotti/spark-py:v3.3.1.0}
 
-#minikube kubectl -- run -it --rm --image=$TAG --restart=Never spark-bash -- /bin/bash
-
-minikube kubectl -- run spark-bash -it --rm --image=$TAG --overrides='
+minikube kubectl -- run spark-bash -it --rm --image=$SPARK_IM --overrides='
 {
 	"kind": "Pod",
 	"apiVersion": "v1",
@@ -16,7 +14,7 @@ minikube kubectl -- run spark-bash -it --rm --image=$TAG --overrides='
         "containers": [
             {
                 "name": "spark-bash",
-                "image": "'$TAG'",
+                "image": "'$SPARK_IM'",
                 "command": ["/opt/entrypoint.sh"],
                 "args": ["/bin/bash"],
                 "stdin": true,
