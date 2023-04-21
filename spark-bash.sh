@@ -24,7 +24,7 @@ minikube kubectl -- run spark-bash -it --rm --image=$TAG --overrides='
                 "volumeMounts": [
                     {
                         "name": "shared-volume",
-                        "mountPath": "/files"
+                        "mountPath": "/shared-folder"
                     }
                 ],
                 "terminationMessagePolicy": "FallbackToLogsOnError",
@@ -36,7 +36,7 @@ minikube kubectl -- run spark-bash -it --rm --image=$TAG --overrides='
             {
                 "name": "shared-volume",
                 "hostPath": {
-                    "path": "/files/"
+                    "path": "/shared-folder/"
                 }
             }
         ]
