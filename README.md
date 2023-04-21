@@ -116,7 +116,7 @@ $SPARK_HOME/bin/spark-submit \
 Open a new terminal window and from the folder of this repo keep running:
 ```sh
 export MOUNT_PATH=/shared-folder
-minikube mount --uid=185 ./shared_folder:$MOUNT_PATH
+minikube mount --uid=185 ./shared-folder:$MOUNT_PATH
 ```
 
 #### Run wordcount example
