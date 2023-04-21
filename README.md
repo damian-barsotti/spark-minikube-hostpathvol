@@ -29,11 +29,10 @@ minikube start --cpus 4 --memory 8192
 export SPARK_HOME="<something>/spark-3.3.1-bin-hadoop3"
 ```
 
-#### Share Minikube images with docker
+#### Share Minikube images with docker (optional)
 
 ```sh
 eval $(minikube -p minikube docker-env)
-docker images spark
 ```
 
 #### Create Kubernet resources
