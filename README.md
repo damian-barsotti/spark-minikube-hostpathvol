@@ -195,7 +195,7 @@ Then, run `spark-shell`:
 $SPARK_HOME/bin/spark-shell --master k8s://https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT --conf spark.driver.host=$SPARK_DRIVER_BIND_ADDRESS --conf spark.kubernetes.container.image=apache/spark:v3.3.1 --conf spark.kubernetes.context=minikube --conf spark.kubernetes.namespace=spark-demo  --verbose
 ```
 
-Copy and paste de following program:
+Finally, copy and paste de following program:
 ```scala
 val rdd = sc.parallelize(Array.range(1,100))
 rdd.sum()
