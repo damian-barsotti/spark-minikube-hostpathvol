@@ -187,7 +187,7 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
 
 Run shell inside minikube:
 ```sh
-./spark-bash
+./spark-bash.sh
 ```
 
 Then, run `spark-shell`:
