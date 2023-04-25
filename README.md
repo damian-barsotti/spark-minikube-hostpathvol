@@ -147,7 +147,7 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     $MOUNT_PATH/LICENSE $MOUNT_PATH/wc-out
 ```
 
-#### Write/read table with metastore db
+### Write/read table with metastore db
 
 ```sh
 kubectl apply -f metastore-mysql/mysql.yaml
@@ -183,7 +183,7 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     local://$MOUNT_PATH/load_data_write_to_server.py
 ```
 
-#### Run `spark-shell` inside minikube
+### Run `spark-shell` inside minikube
 
 Run shell inside minikube:
 ```sh
