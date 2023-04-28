@@ -199,7 +199,7 @@ export THRIFT_IP_PORT=$(minikube service -n spark-demo spark-thrift-server --url
 $SPARK_HOME/bin/beeline  -u jdbc:hive2://$THRIFT_IP_PORT -n root
 ```
 
-### Run `spark-shell` inside minikube
+### `spark-shell` inside minikube
 
 Run shell inside minikube:
 ```sh
