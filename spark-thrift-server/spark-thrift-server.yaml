@@ -1,0 +1,61 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-thrift-server
+  labels:
+    app: spark-thrift-server
+spec:
+  ports:
+    - protocol: TCP
+      port: 10000
+      targetPort: 10000
+  selector:
+    app: spark-thrift-server
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-thrift-server
+  labels:
+    app: spark-thrift-server
+spec:
+  selector:
+    matchLabels:
+      app: spark-thrift-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: spark-thrift-server
+    spec:
+      serviceAccountName: spark
+      containers:
+      - image: damianbarsotti/spark-py:v3.3.1.0
+        name: spark-thrift-server
+        command: ["/opt/entrypoint.sh"]
+        args: ["/opt/spark/sbin/start-thriftserver.sh", 
+                "--master", "k8s://https://$(KUBERNETES_SERVICE_HOST):$(KUBERNETES_SERVICE_PORT)",
+                "--conf", "spark.driver.host=$(SPARK_DRIVER_BIND_ADDRESS)",
+                "--conf", "spark.kubernetes.container.image=apache/spark:v3.3.1",
+                "--conf", "spark.kubernetes.context=minikube",
+                "--conf", "spark.kubernetes.namespace=spark-demo",
+                "--conf", "spark.kubernetes.executor.deleteOnTermination=false",
+                "--total-executor-cores", "2"
+              ]
+        env:
+        - name: SPARK_USER
+          value: damian
+        - name: SPARK_DRIVER_BIND_ADDRESS
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: SPARK_CONF_DIR
+          value: /opt/spark/conf
+        - name: SPARK_NO_DAEMONIZE
+          value: "true"
+        ports:
+        - containerPort: 10000

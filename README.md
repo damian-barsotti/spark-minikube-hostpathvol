@@ -183,6 +183,22 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     local://$MOUNT_PATH/load_data_write_to_server.py
 ```
 
+### Thrift Server
+
+```sh
+kubectl apply -f spark-thrift-server/spark-thrift-server.yaml
+```
+
+#### Test thrift server:
+
+```sh
+export THRIFT_IP_PORT=$(minikube service -n spark-demo spark-thrift-server --url | cut -d/ -f 3)
+```
+
+```sh
+$SPARK_HOME/bin/beeline  -u jdbc:hive2://$THRIFT_IP_PORT -n root
+```
+
 ### Run `spark-shell` inside minikube
 
 Run shell inside minikube:
