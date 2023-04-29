@@ -178,7 +178,7 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     --conf spark.hadoop.javax.jdo.option.ConnectionUserName=root \
     --conf spark.hadoop.javax.jdo.option.ConnectionDriverName=com.mysql.cj.jdbc.Driver \
     --conf spark.hadoop.javax.jdo.option.ConnectionPassword=my-secret-pw \
-    --conf spark.sql.warehouse.dir=/shared-folder/spark-warehouse \
+    --conf spark.sql.warehouse.dir=$MOUNT_PATH/spark-warehouse \
     --verbose \
     local://$MOUNT_PATH/load_data_write_to_server.py
 ```
