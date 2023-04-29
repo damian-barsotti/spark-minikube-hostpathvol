@@ -32,8 +32,12 @@ spec:
         app: spark-thrift-server
     spec:
       serviceAccountName: spark
+      volumes:
+        - name: shared-volume
+          hostPath:
+            path: /shared-folder/
       containers:
-      - image: apache/spark:v3.3.1
+      - image: damianbarsotti/spark-py:v3.3.1.0
         name: spark-thrift-server
         command: ["/opt/entrypoint.sh"]
         args: [ "/bin/bash", "-c", 
@@ -43,8 +47,20 @@ spec:
                 --conf spark.kubernetes.container.image=apache/spark:v3.3.1 \
                 --conf spark.kubernetes.context=minikube \
                 --conf spark.kubernetes.namespace=spark-demo \
+                --conf spark.kubernetes.driver.volumes.$(VOLUME_TYPE).$(VOLUME_NAME).mount.path=$(MOUNT_PATH) \
+                --conf spark.kubernetes.driver.volumes.$(VOLUME_TYPE).$(VOLUME_NAME).options.path=$(MOUNT_PATH) \
+                --conf spark.kubernetes.executor.volumes.$(VOLUME_TYPE).$(VOLUME_NAME).mount.path=$(MOUNT_PATH) \
+                --conf spark.kubernetes.executor.volumes.$(VOLUME_TYPE).$(VOLUME_NAME).options.path=$(MOUNT_PATH) \
+                --conf spark.hadoop.javax.jdo.option.ConnectionURL=jdbc:mysql://metastore-db/metastore \
+                --conf spark.hadoop.javax.jdo.option.ConnectionUserName=root \
+                --conf spark.hadoop.javax.jdo.option.ConnectionDriverName=com.mysql.cj.jdbc.Driver \
+                --conf spark.hadoop.javax.jdo.option.ConnectionPassword=my-secret-pw \
+                --conf spark.sql.warehouse.dir=$(MOUNT_PATH)/spark-warehouse \
                 --total-executor-cores 2"
               ]
+        volumeMounts:
+          - name: shared-volume
+            mountPath: /shared-folder
         env:
         - name: SPARK_USER
           value: damian
@@ -57,5 +73,11 @@ spec:
           value: /opt/spark/conf
         - name: SPARK_NO_DAEMONIZE
           value: "true"
+        - name: VOLUME_TYPE
+          value: "hostPath"
+        - name: VOLUME_NAME
+          value: "demo-host-mount"
+        - name: MOUNT_PATH
+          value: "/shared-folder"
         ports:
         - containerPort: 10000
