@@ -42,7 +42,6 @@ spec:
                 "--conf", "spark.kubernetes.container.image=apache/spark:v3.3.1",
                 "--conf", "spark.kubernetes.context=minikube",
                 "--conf", "spark.kubernetes.namespace=spark-demo",
-                "--conf", "spark.kubernetes.executor.deleteOnTermination=false",
                 "--total-executor-cores", "2"
               ]
         env:
