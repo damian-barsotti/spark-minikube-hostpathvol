@@ -183,6 +183,11 @@ $SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode cluster \
     local://$MOUNT_PATH/load_data_write_to_server.py
 ```
 
+#### To see program's output:
+```sh
+kubectl logs test-metastore
+```
+
 ### Thrift Server
 
 ```sh
