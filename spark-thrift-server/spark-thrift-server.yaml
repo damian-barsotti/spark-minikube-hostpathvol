@@ -33,7 +33,7 @@ spec:
     spec:
       serviceAccountName: spark
       containers:
-      - image: damianbarsotti/spark-py:v3.3.1.0
+      - image: apache/spark:v3.3.1
         name: spark-thrift-server
         command: ["/opt/entrypoint.sh"]
         args: ["/opt/spark/sbin/start-thriftserver.sh", 
