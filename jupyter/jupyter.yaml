@@ -37,7 +37,7 @@ spec:
           hostPath:
             path: /shared-folder/
       containers:
-      - image: damianbarsotti/pyspark-notebook:v3.3.1.0
+      - image: damianbarsotti/pyspark-notebook:v3.3.1.1
         name: jupyter
         stdin: true
         tty: true
@@ -49,5 +49,18 @@ spec:
         env:
         - name: JUPYTER_PORT
           value: "8888"
+        - name: SPARK_USER
+          value: damian
+        - name: SPARK_DRIVER_BIND_ADDRESS
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: VOLUME_TYPE
+          value: "hostPath"
+        - name: VOLUME_NAME
+          value: "demo-host-mount"
+        - name: MOUNT_PATH
+          value: "/shared-folder"
         ports:
         - containerPort: 8888

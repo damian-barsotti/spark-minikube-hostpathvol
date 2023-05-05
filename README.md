@@ -230,10 +230,16 @@ minikube service -n spark-demo jupyter
 kubectl logs deployment/jupyter
 ```
 or
-
 ```sh
 kubectl exec deployment/jupyter -- jupyter server list --jsonlist
 ```
+
+#### Examples
+
+There are some notebooks inside 'work' folder (mounted from ./shared-folder).
+
+These examples run Spark on kubernetes from Jupyter's notebooks.
+
 
 ### `spark-shell` inside minikube
 
