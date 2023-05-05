@@ -218,6 +218,11 @@ kubectl get pods --field-selector 'status.phase=Succeeded' -o name | xargs minik
 ```sh
 kubectl apply -f spark-thrift-server/spark-thrift-server.yaml
 ```
+### Start jupyter in browser
+
+```sh
+minikube service -n spark-demo jupyter
+```
 
 #### Show token:
 
