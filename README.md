@@ -263,3 +263,89 @@ Finally, copy and paste de following program:
 val rdd = sc.parallelize(Array.range(1,100))
 rdd.sum()
 ```
+
+### Run all examples inside minikube
+
+You can run all the previous examples executing 'spar-submit' inside the shell. So, you don´t need to install Spark.
+
+First you need to run the shell  inside minikube:
+```sh
+./spark-bash.sh
+```
+
+#### SparkPi example
+
+```sh
+export K8S_SERVER=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+```
+```sh
+$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode client \
+    --name spark-pi --class org.apache.spark.examples.SparkPi \
+    --conf spark.driver.host=$SPARK_DRIVER_BIND_ADDRESS \
+    --conf spark.kubernetes.container.image=apache/spark:v3.3.1 \
+    --conf spark.kubernetes.context=minikube \
+    --conf spark.kubernetes.namespace=spark-demo \
+    --conf spark.executor.instances=3 --verbose \
+    local:///opt/spark/examples/jars/spark-examples_2.12-3.3.1.jar 100
+```
+
+#### WordCount example
+
+Open a new terminal window and from the folder of this repo keep running:
+```sh
+export MOUNT_PATH=/shared-folder
+minikube mount --uid=185 ./shared-folder:$MOUNT_PATH
+```
+
+Then, in the minikube shell run:
+
+```sh
+export K8S_SERVER=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+export VOLUME_TYPE=hostPath
+export VOLUME_NAME=demo-host-mount
+export MOUNT_PATH=/shared-folder
+```
+```sh
+$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode client \
+    --name wordcount --class WordCount \
+    --conf spark.driver.host=$SPARK_DRIVER_BIND_ADDRESS \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.container.image=apache/spark:v3.3.1 \
+    --conf spark.kubernetes.context=minikube \
+    --conf spark.kubernetes.namespace=spark-demo \
+    --conf spark.executor.instances=3 --verbose \
+    local://$MOUNT_PATH/word_count/target/scala-2.12/wordcount_2.12-1.0.jar \
+    $MOUNT_PATH/LICENSE $MOUNT_PATH/wc-out
+```
+#### Write/read table with metastore db example
+
+```sh
+export K8S_SERVER=https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT
+export VOLUME_TYPE=hostPath
+export VOLUME_NAME=demo-host-mount
+export MOUNT_PATH=/shared-folder
+```
+
+```sh
+$SPARK_HOME/bin/spark-submit --master k8s://$K8S_SERVER --deploy-mode client \
+    --name test-metastore \
+    --conf spark.driver.host=$SPARK_DRIVER_BIND_ADDRESS \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.driver.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.mount.path=$MOUNT_PATH \
+    --conf spark.kubernetes.executor.volumes.$VOLUME_TYPE.$VOLUME_NAME.options.path=$MOUNT_PATH \
+    --conf spark.kubernetes.container.image=damianbarsotti/spark-py:v3.3.1.0 \
+    --conf spark.kubernetes.context=minikube \
+    --conf spark.kubernetes.namespace=spark-demo \
+    --conf spark.executor.instances=3 --verbose \
+    --conf spark.hadoop.javax.jdo.option.ConnectionURL=jdbc:mysql://metastore-db/metastore \
+    --conf spark.hadoop.javax.jdo.option.ConnectionUserName=root \
+    --conf spark.hadoop.javax.jdo.option.ConnectionDriverName=com.mysql.cj.jdbc.Driver \
+    --conf spark.hadoop.javax.jdo.option.ConnectionPassword=my-secret-pw \
+    --conf spark.sql.warehouse.dir=$MOUNT_PATH/spark-warehouse \
+    --verbose \
+    local://$MOUNT_PATH/load_data_write_to_server.py
+```
