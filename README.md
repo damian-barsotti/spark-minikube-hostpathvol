@@ -213,6 +213,23 @@ kubectl delete -f spark-thrift-server/spark-thrift-server.yaml
 kubectl get pods --field-selector 'status.phase=Succeeded' -o name | xargs minikube kubectl -- delete
 ```
 
+### Jupyter pyspark notebook
+
+```sh
+kubectl apply -f spark-thrift-server/spark-thrift-server.yaml
+```
+
+#### Show token:
+
+```sh
+kubectl logs deployment/jupyter
+```
+or
+
+```sh
+kubectl exec deployment/jupyter -- jupyter server list --jsonlist
+```
+
 ### `spark-shell` inside minikube
 
 Run shell inside minikube:

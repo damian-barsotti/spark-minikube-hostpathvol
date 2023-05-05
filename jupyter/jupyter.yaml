@@ -1,0 +1,53 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: jupyter
+  labels:
+    app: jupyter
+spec:
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888
+  selector:
+    app: jupyter
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter
+  labels:
+    app: jupyter
+spec:
+  selector:
+    matchLabels:
+      app: jupyter
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: jupyter
+    spec:
+      serviceAccountName: spark
+      volumes:
+        - name: shared-volume
+          hostPath:
+            path: /shared-folder/
+      containers:
+      - image: damianbarsotti/pyspark-notebook:v3.3.1.0
+        name: jupyter
+        stdin: true
+        tty: true
+        volumeMounts:
+          - name: shared-volume
+            mountPath: /shared-folder
+          - name: shared-volume
+            mountPath: /home/jovyan/work
+        env:
+        - name: JUPYTER_PORT
+          value: "8888"
+        ports:
+        - containerPort: 8888
